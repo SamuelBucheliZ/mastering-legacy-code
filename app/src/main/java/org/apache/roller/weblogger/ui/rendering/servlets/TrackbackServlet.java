@@ -42,7 +42,7 @@ import org.apache.roller.weblogger.ui.rendering.plugins.comments.CommentValidati
 import org.apache.roller.weblogger.ui.rendering.plugins.comments.TrackbackLinkbackCommentValidator;
 import org.apache.roller.weblogger.ui.rendering.util.WeblogTrackbackRequest;
 import org.apache.roller.weblogger.util.I18nMessages;
-import org.apache.roller.weblogger.util.MailUtil;
+import org.apache.roller.weblogger.util.MailUtilInstance;
 import org.apache.roller.weblogger.util.RollerMessages;
 import org.apache.roller.weblogger.util.cache.CacheManager;
 
@@ -190,10 +190,8 @@ public class TrackbackServlet extends HttpServlet {
                     }
                     
                     // Send email notifications
-                    MailUtil.sendEmailNotification(comment, messages, 
-                            I18nMessages.getMessages(trackbackRequest.getLocaleInstance()),
-                            validationScore == RollerConstants.PERCENT_100);
-                    
+                    MailUtilInstance.INSTANCE.sendEmailNotification(comment, messages, I18nMessages.getMessages(trackbackRequest.getLocaleInstance()), validationScore == RollerConstants.PERCENT_100);
+
                     if (ApprovalStatus.PENDING.equals(comment.getStatus())) {
                         pw.println(this.getSuccessResponse("Trackback submitted to moderator"));
                     } else {

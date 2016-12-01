@@ -36,7 +36,7 @@ import org.apache.roller.weblogger.config.WebloggerConfig;
  * are also aware of when the file changes via some outside source and we will
  * automatically re-read the file and update the list when that happens.
  */
-public final class IPBanList {
+public class IPBanList {
     
     private static Log log = LogFactory.getLog(IPBanList.class);
     

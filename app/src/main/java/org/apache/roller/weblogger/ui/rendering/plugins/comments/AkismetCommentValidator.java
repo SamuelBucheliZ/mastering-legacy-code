@@ -19,6 +19,7 @@
 package org.apache.roller.weblogger.ui.rendering.plugins.comments;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -27,6 +28,7 @@ import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.roller.util.RollerConstants;
+import org.apache.roller.weblogger.business.Weblogger;
 import org.apache.roller.weblogger.business.WebloggerFactory;
 import org.apache.roller.weblogger.config.WebloggerConfig;
 import org.apache.roller.weblogger.pojos.WeblogEntryComment;
@@ -41,12 +43,23 @@ import org.apache.roller.weblogger.util.RollerMessages;
  */
 public class AkismetCommentValidator implements CommentValidator { 
     private static Log log = LogFactory.getLog(AkismetCommentValidator.class);    
-    private ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources");
+    private ResourceBundle bundle;
     private String apikey;
     
     /** Creates a new instance of AkismetCommentValidator */
     public AkismetCommentValidator() {
-        apikey = WebloggerConfig.getProperty("comment.validator.akismet.apikey");
+        this(
+                ResourceBundle.getBundle("ApplicationResources"),
+                WebloggerConfig.getProperty("comment.validator.akismet.apikey")
+        );
+    }
+
+    public AkismetCommentValidator(
+            ResourceBundle bundle,
+            String apikey
+    ) {
+        this.bundle = bundle;
+        this.apikey = apikey;
     }
 
     public String getName() {
@@ -56,7 +69,7 @@ public class AkismetCommentValidator implements CommentValidator {
     public int validate(WeblogEntryComment comment, RollerMessages messages) {
         StringBuilder sb = new StringBuilder();
         sb.append("blog=").append(
-            WebloggerFactory.getWeblogger().getUrlStrategy().getWeblogURL(comment.getWeblogEntry().getWebsite(), null, true)).append("&");
+                getWeblogger().getUrlStrategy().getWeblogURL(comment.getWeblogEntry().getWebsite(), null, true)).append("&");
         sb.append("user_ip="        ).append(comment.getRemoteHost()).append("&");
         sb.append("user_agent="     ).append(comment.getUserAgent()).append("&");
         sb.append("referrer="       ).append(comment.getReferrer()).append("&");
@@ -68,21 +81,7 @@ public class AkismetCommentValidator implements CommentValidator {
         sb.append("comment_content="     ).append(comment.getContent());
 
         try {
-            URL url = new URL("http://" + apikey + ".rest.akismet.com/1.1/comment-check");
-            URLConnection conn = url.openConnection();
-            conn.setDoOutput(true);
-
-            conn.setRequestProperty("User_Agent", "Roller " + WebloggerFactory.getWeblogger().getVersion()); 
-            conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf8"); 
-            conn.setRequestProperty("Content-length", Integer.toString(sb.length()));
-
-            OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream());
-            osr.write(sb.toString(), 0, sb.length());
-            osr.flush();
-            osr.close();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream())); 
-            String response = br.readLine();
+            String response = callAksimetService(sb);
             if ("true".equals(response)) {
                 messages.addError("comment.validator.akismetMessage");
                 return 0;
@@ -96,6 +95,29 @@ public class AkismetCommentValidator implements CommentValidator {
         // interpreting error as spam: better safe than sorry?
         return 0;
     }
+
+    String callAksimetService(StringBuilder sb) throws IOException {
+        URL url = new URL("http://" + apikey + ".rest.akismet.com/1.1/comment-check");
+        URLConnection conn = url.openConnection();
+        conn.setDoOutput(true);
+
+        conn.setRequestProperty("User_Agent", "Roller " + getWeblogger().getVersion());
+        conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf8");
+        conn.setRequestProperty("Content-length", Integer.toString(sb.length()));
+
+        OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream());
+        osr.write(sb.toString(), 0, sb.length());
+        osr.flush();
+        osr.close();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        return br.readLine();
+    }
+
+    Weblogger getWeblogger() {
+        return WebloggerFactory.getWeblogger();
+    }
+
 }
 
 

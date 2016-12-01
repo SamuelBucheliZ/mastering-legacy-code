@@ -36,7 +36,7 @@ import org.apache.roller.weblogger.pojos.User;
 import org.apache.roller.weblogger.ui.core.RollerSession;
 import org.apache.roller.weblogger.ui.core.security.CustomUserRegistry;
 import org.apache.roller.weblogger.ui.struts2.util.UIAction;
-import org.apache.roller.weblogger.util.MailUtil;
+import org.apache.roller.weblogger.util.MailUtilInstance;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 
@@ -249,7 +249,7 @@ public class Register extends UIAction implements ServletRequestAware {
                 if (activationEnabled && ud.getActivationCode() != null) {
                     try {
                         // send activation mail to the user
-                        MailUtil.sendUserActivationEmail(ud);
+                        MailUtilInstance.INSTANCE.sendUserActivationEmail(ud);
                     } catch (WebloggerException ex) {
                         log.error("Error sending activation email to - " + ud.getEmailAddress(), ex);
                     }
