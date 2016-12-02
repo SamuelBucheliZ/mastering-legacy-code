@@ -339,5 +339,23 @@ public class WeblogEntryComment implements Serializable {
             .append(getWeblogEntry())
             .toHashCode();
     }
-    
+
+    public String getStateAsString() {
+        return "WeblogEntryComment{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", url='" + url + '\'' +
+                ", content='" + content + '\'' +
+                ", postTime=" + postTime +
+                ", status=" + status +
+                ", notify=" + notify +
+                ", remoteHost='" + remoteHost + '\'' +
+                ", referrer='" + referrer + '\'' +
+                ", userAgent='" + userAgent + '\'' +
+                ", plugins='" + plugins + '\'' +
+                ", contentType='" + contentType + '\'' +
+                ", weblogEntry=" + weblogEntry +
+                '}';
+    }
 }

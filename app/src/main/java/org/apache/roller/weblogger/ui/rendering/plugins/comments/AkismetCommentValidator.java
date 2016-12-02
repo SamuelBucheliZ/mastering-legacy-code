@@ -42,9 +42,10 @@ import org.apache.roller.weblogger.util.RollerMessages;
  * See Akismet site for API details (http://akismet.com/development/api/)
  */
 public class AkismetCommentValidator implements CommentValidator { 
-    private static Log log = LogFactory.getLog(AkismetCommentValidator.class);    
-    private ResourceBundle bundle;
-    private String apikey;
+    private static Log log = LogFactory.getLog(AkismetCommentValidator.class);
+
+    private final ResourceBundle bundle;
+    private final String apikey;
     
     /** Creates a new instance of AkismetCommentValidator */
     public AkismetCommentValidator() {

@@ -4,6 +4,7 @@ package org.apache.roller.weblogger.ui.rendering.plugins.comments;
 import org.apache.roller.util.RollerConstants;
 import org.apache.roller.weblogger.business.Weblogger;
 import org.apache.roller.weblogger.pojos.Weblog;
+import org.apache.roller.weblogger.pojos.WeblogEntry;
 import org.apache.roller.weblogger.pojos.WeblogEntryComment;
 import org.apache.roller.weblogger.util.RollerMessages;
 import org.junit.Before;
@@ -20,6 +21,7 @@ public class AkismetCommentValidatorTest {
     private Weblog weblog;
     private Weblogger weblogger;
     private WeblogEntryComment comment;
+    private String originalCommentState;
     private RollerMessages messages;
 
 
@@ -31,8 +33,14 @@ public class AkismetCommentValidatorTest {
         when(weblogger.getVersion()).thenReturn("1.2.3");
         when(weblogger.getUrlStrategy().getWeblogURL(weblog, null, true)).thenReturn("test.url");
 
-        comment = mock(WeblogEntryComment.class, RETURNS_DEEP_STUBS);
-        when(comment.getWeblogEntry().getWebsite()).thenReturn(weblog);
+        WeblogEntry entry = spy(new WeblogEntry());
+        entry.setWebsite(new Weblog());
+        doReturn("test.perma.link").when(entry).getPermalink();
+
+        comment = new WeblogEntryComment();
+        comment.setWeblogEntry(entry);
+
+        originalCommentState = comment.getStateAsString();
 
         messages = mock(RollerMessages.class);
     }
@@ -45,6 +53,7 @@ public class AkismetCommentValidatorTest {
         int returnValue = akismetCommentValidator.validate(comment, null);
 
         assertEquals(RollerConstants.PERCENT_100, returnValue);
+        assertEquals(comment.getStateAsString(), originalCommentState);
         verify(messages, never()).addError(anyString());
     }
 
@@ -60,6 +69,7 @@ public class AkismetCommentValidatorTest {
         int returnValue = akismetCommentValidator.validate(comment, messages);
 
         assertEquals(0, returnValue);
+        assertEquals(comment.getStateAsString(), originalCommentState);
         verify(messages).addError("comment.validator.akismetMessage");
     }
 
@@ -72,6 +82,7 @@ public class AkismetCommentValidatorTest {
         int returnValue = akismetCommentValidator.validate(comment, messages);
 
         assertEquals(0, returnValue);
+        assertEquals(comment.getStateAsString(), originalCommentState);
         verify(messages, never()).addError(anyString());
     }
 }
