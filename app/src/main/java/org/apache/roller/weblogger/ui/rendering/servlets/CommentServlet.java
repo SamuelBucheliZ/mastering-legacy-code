@@ -36,10 +36,10 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.roller.util.RollerConstants;
 import org.apache.roller.weblogger.WebloggerException;
 import org.apache.roller.weblogger.config.WebloggerConfig;
-import org.apache.roller.weblogger.config.WebloggerRuntimeConfig;
 import org.apache.roller.weblogger.business.search.IndexManager;
 import org.apache.roller.weblogger.business.WebloggerFactory;
 import org.apache.roller.weblogger.business.WeblogEntryManager;
+import org.apache.roller.weblogger.config.WebloggerRuntimeConfigInstance;
 import org.apache.roller.weblogger.pojos.WeblogEntryComment;
 import org.apache.roller.weblogger.pojos.WeblogEntryComment.ApprovalStatus;
 import org.apache.roller.weblogger.pojos.WeblogEntry;
@@ -259,16 +259,14 @@ public class CommentServlet extends HttpServlet {
         comment.setPostTime(new Timestamp(System.currentTimeMillis()));
 
         // set comment content-type depending on if html is allowed
-        if (WebloggerRuntimeConfig
-                .getBooleanProperty("users.comments.htmlenabled")) {
+        if (WebloggerRuntimeConfigInstance.INSTANCE.getBooleanProperty("users.comments.htmlenabled")) {
             comment.setContentType("text/html");
         } else {
             comment.setContentType("text/plain");
         }
 
         // set whatever comment plugins are configured
-        comment.setPlugins(WebloggerRuntimeConfig
-                .getProperty("users.comments.plugins"));
+        comment.setPlugins(WebloggerRuntimeConfigInstance.INSTANCE.getProperty("users.comments.plugins"));
 
         WeblogEntryCommentForm cf = new WeblogEntryCommentForm();
         cf.setData(comment);
@@ -367,8 +365,7 @@ public class CommentServlet extends HttpServlet {
 
             try {
                 if (!ApprovalStatus.SPAM.equals(comment.getStatus())
-                        || !WebloggerRuntimeConfig
-                                .getBooleanProperty("comments.ignoreSpam.enabled")) {
+                        || !WebloggerRuntimeConfigInstance.INSTANCE.getBooleanProperty("comments.ignoreSpam.enabled")) {
 
                     WeblogEntryManager mgr = WebloggerFactory.getWeblogger()
                             .getWeblogEntryManager();

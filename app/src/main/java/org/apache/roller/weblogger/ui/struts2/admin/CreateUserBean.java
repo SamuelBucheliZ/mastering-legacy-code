@@ -22,6 +22,7 @@ import java.util.Collections;
 import org.apache.roller.weblogger.WebloggerException;
 import org.apache.roller.weblogger.business.WebloggerFactory;
 import org.apache.roller.weblogger.pojos.GlobalPermission;
+import org.apache.roller.weblogger.pojos.OpenIdUrl;
 import org.apache.roller.weblogger.pojos.User;
 
 
@@ -148,7 +149,7 @@ public class CreateUserBean {
         dataHolder.setEmailAddress(this.emailAddress);
         dataHolder.setLocale(this.locale);
         dataHolder.setTimeZone(this.timeZone);
-        dataHolder.setOpenIdUrl(this.openIdUrl);
+        dataHolder.setOpenIdUrl(new OpenIdUrl(this.openIdUrl));
         dataHolder.setEnabled(this.enabled);
         dataHolder.setActivationCode(this.activationCode);
     }
@@ -164,7 +165,7 @@ public class CreateUserBean {
         this.emailAddress = dataHolder.getEmailAddress();
         this.locale = dataHolder.getLocale();
         this.timeZone = dataHolder.getTimeZone();
-        this.openIdUrl = dataHolder.getOpenIdUrl();
+        this.openIdUrl = dataHolder.getOpenIdUrl().getOpenIdUrl();
         this.enabled = dataHolder.getEnabled();
         this.activationCode = dataHolder.getActivationCode();
 

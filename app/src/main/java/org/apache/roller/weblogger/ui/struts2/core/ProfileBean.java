@@ -18,6 +18,7 @@
 
 package org.apache.roller.weblogger.ui.struts2.core;
 
+import org.apache.roller.weblogger.pojos.OpenIdUrl;
 import org.apache.roller.weblogger.pojos.User;
 
 
@@ -138,7 +139,7 @@ public class ProfileBean {
         dataHolder.setEmailAddress(this.emailAddress);
         dataHolder.setLocale(this.locale);
         dataHolder.setTimeZone(this.timeZone);
-        dataHolder.setOpenIdUrl(this.openIdUrl);
+        dataHolder.setOpenIdUrl(new OpenIdUrl(this.openIdUrl));
     }
     
     
@@ -151,7 +152,22 @@ public class ProfileBean {
         this.emailAddress = dataHolder.getEmailAddress();
         this.locale = dataHolder.getLocale();
         this.timeZone = dataHolder.getTimeZone();
-        this.openIdUrl = dataHolder.getOpenIdUrl();
+        this.openIdUrl = dataHolder.getOpenIdUrl().getOpenIdUrl();
     }
-    
+
+    public String getStateString() {
+        return "ProfileBean{" +
+                "id='" + id + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", screenName='" + screenName + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", locale='" + locale + '\'' +
+                ", timeZone='" + timeZone + '\'' +
+                ", openIdUrl='" + openIdUrl + '\'' +
+                ", passwordText='" + passwordText + '\'' +
+                ", passwordConfirm='" + passwordConfirm + '\'' +
+                '}';
+    }
 }

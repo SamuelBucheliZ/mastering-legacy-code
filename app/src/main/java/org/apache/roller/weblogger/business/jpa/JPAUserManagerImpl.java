@@ -26,12 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.roller.weblogger.WebloggerException;
 import org.apache.roller.weblogger.business.UserManager;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import javax.persistence.TypedQuery;
 import org.apache.roller.weblogger.config.WebloggerConfig;
 import org.apache.roller.weblogger.pojos.GlobalPermission;
@@ -596,5 +591,33 @@ public class JPAUserManagerImpl implements UserManager {
         } catch (NoResultException e) {
             throw new WebloggerException("ERROR: removing role", e);
         }
+    }
+
+    @Override
+    public String createActivationCode() throws WebloggerException {
+        // Create & save the activation data
+        String inActivationCode = UUID.randomUUID().toString();
+
+        if (getUserByActivationCode(inActivationCode) != null) {
+            // In the *extremely* unlikely event that we generate an
+            // activation code that is already use, we'll retry 3 times.
+            int numOfRetries = 3;
+            if (numOfRetries < 1) {
+                numOfRetries = 1;
+            }
+            for (int i = 0; i < numOfRetries; i++) {
+                inActivationCode = UUID.randomUUID().toString();
+                if (getUserByActivationCode(inActivationCode) == null) {
+                    break;
+                } else {
+                    inActivationCode = null;
+                }
+            }
+            // In more unlikely event that three retries isn't enough
+            if (inActivationCode == null){
+                throw new WebloggerException("error.add.user.activationCodeInUse");
+            }
+        }
+        return inActivationCode;
     }
 }

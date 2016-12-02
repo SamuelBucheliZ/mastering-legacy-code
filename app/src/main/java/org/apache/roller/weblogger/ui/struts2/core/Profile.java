@@ -26,6 +26,7 @@ import org.apache.roller.weblogger.business.WebloggerFactory;
 import org.apache.roller.weblogger.business.UserManager;
 import org.apache.roller.weblogger.config.AuthMethod;
 import org.apache.roller.weblogger.config.WebloggerConfig;
+import org.apache.roller.weblogger.pojos.OpenIdUrl;
 import org.apache.roller.weblogger.pojos.User;
 import org.apache.roller.weblogger.ui.struts2.util.UIAction;
 import org.apache.struts2.interceptor.validation.SkipValidation;
@@ -76,7 +77,7 @@ public class Profile extends UIAction {
                     if (openidurl != null && openidurl.endsWith("/")) {
                         openidurl = openidurl.substring(0, openidurl.length() - 1);
                     }
-                    existingUser.setOpenIdUrl(openidurl);
+                    existingUser.setOpenIdUrl(new OpenIdUrl(openidurl));
                 } catch (Exception ex) {
                     log.error("Unexpected error saving user OpenID URL", ex);
                     addError("generic.error.check.logs");

@@ -28,6 +28,7 @@ import org.apache.roller.weblogger.WebloggerException;
 import org.apache.roller.weblogger.config.WebloggerConfig;
 import org.apache.roller.util.UUIDGenerator;
 import org.apache.roller.weblogger.business.WebloggerFactory;
+import org.apache.roller.weblogger.ui.struts2.core.ProfileBean;
 import org.apache.roller.weblogger.util.Utilities;
 
 
@@ -41,7 +42,7 @@ public class User implements Serializable {
     private String  id = UUIDGenerator.generateUUID();
     private String  userName;
     private String  password;
-    private String  openIdUrl;
+    private OpenIdUrl  openIdUrl;
     private String  screenName;
     private String  fullName;
     private String  emailAddress;
@@ -69,6 +70,17 @@ public class User implements Serializable {
         this.locale = locale;
         this.timeZone = timeZone;
         this.enabled = isEnabled;
+    }
+
+    public static User createUserFrom(ProfileBean bean) {
+        // copy form data into new user pojo
+        User user = new User();
+        // copyTo skips password
+        bean.copyTo(user);
+        user.setUserName(bean.getUserName());
+        user.setDateCreated(new Date());
+        user.setEnabled(Boolean.TRUE);
+        return user;
     }
 
     /**
@@ -129,11 +141,11 @@ public class User implements Serializable {
     /**
      * Open ID URL of the user, if provided.
      */
-    public String getOpenIdUrl() {
+    public OpenIdUrl getOpenIdUrl() {
         return openIdUrl;
     }
 
-    public void setOpenIdUrl(String openIdUrl) {
+    public void setOpenIdUrl(OpenIdUrl openIdUrl) {
         this.openIdUrl = openIdUrl;
     }
 
@@ -276,4 +288,17 @@ public class User implements Serializable {
         return new HashCodeBuilder().append(getUserName()).toHashCode();
     }
 
+    public String getStateString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", openIdUrl='" + openIdUrl.getStateString() + '\'' +
+                ", screenName='" + screenName + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", locale='" + locale + '\'' +
+                ", timeZone='" + timeZone + '\'' +
+                ", enabled=" + enabled +
+                '}';
+    }
 }

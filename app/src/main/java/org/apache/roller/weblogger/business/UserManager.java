@@ -321,6 +321,8 @@ public interface UserManager {
      * Release any resources held by manager.
      */
     void release();
+
+    String createActivationCode() throws WebloggerException;
 }
 
 

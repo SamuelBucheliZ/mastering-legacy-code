@@ -26,8 +26,9 @@ import org.apache.roller.weblogger.business.MailProvider;
 import org.apache.roller.weblogger.business.WeblogManager;
 import org.apache.roller.weblogger.business.WebloggerFactory;
 import org.apache.roller.weblogger.business.startup.WebloggerStartup;
-import org.apache.roller.weblogger.config.WebloggerRuntimeConfig;
+import org.apache.roller.weblogger.config.WebloggerRuntimeConfigInstance;
 import org.apache.roller.weblogger.pojos.*;
+import org.apache.roller.weblogger.ui.struts2.core.Register;
 import org.apache.roller.weblogger.util.RollerMessages.RollerMessage;
 
 import javax.mail.*;
@@ -148,7 +149,7 @@ public class MailUtilInstance {
             String content;
             
             // Figure URL to entry edit page
-            String rootURL = WebloggerRuntimeConfig.getAbsoluteContextURL();
+            String rootURL = WebloggerRuntimeConfigInstance.INSTANCE.getAbsoluteContextURL();
             String url = rootURL + "/roller-ui/menu.rol";
             
             ResourceBundle resources = ResourceBundle.getBundle(
@@ -198,9 +199,8 @@ public class MailUtilInstance {
         try {
             ResourceBundle resources = ResourceBundle.getBundle(
                     "ApplicationResources", I18nUtils.toLocale(user.getLocale()));
-            
-            String from = WebloggerRuntimeConfig.getProperty(
-                    "user.account.activation.mail.from");
+
+            String from = WebloggerRuntimeConfigInstance.INSTANCE.getProperty("user.account.activation.mail.from");
             
             String cc[] = new String[0];
             String bcc[] = new String[0];
@@ -208,8 +208,8 @@ public class MailUtilInstance {
             String subject = resources.getString(
                     "user.account.activation.mail.subject");
             String content;
-            
-            String rootURL = WebloggerRuntimeConfig.getAbsoluteContextURL();
+
+            String rootURL = WebloggerRuntimeConfigInstance.INSTANCE.getAbsoluteContextURL();
             
             StringBuilder sb = new StringBuilder();
             
@@ -252,7 +252,7 @@ public class MailUtilInstance {
         
         // Only send email if email notification is enabled, or a pending message that needs moderation.
         if (!commentObject.getPending()) {
-            boolean notify = WebloggerRuntimeConfig.getBooleanProperty("users.comments.emailnotify");
+            boolean notify = WebloggerRuntimeConfigInstance.INSTANCE.getBooleanProperty("users.comments.emailnotify");
             if (!notify) {
                 // notifications disabled, just bail
                 return;
@@ -300,7 +300,7 @@ public class MailUtilInstance {
         // Determine with mime type to use for e-mail
         StringBuilder msg = new StringBuilder();
         StringBuilder ownermsg = new StringBuilder();
-        boolean escapeHtml = !WebloggerRuntimeConfig.getBooleanProperty("users.comments.htmlenabled");
+        boolean escapeHtml = !WebloggerRuntimeConfigInstance.INSTANCE.getBooleanProperty("users.comments.htmlenabled");
         
         // first the common stub message for the owner and commenters (if applicable)
         if (!escapeHtml) {
@@ -676,6 +676,15 @@ public class MailUtilInstance {
     public void sendHTMLMessage(String from, String[] to, String[] cc, String[] bcc, String subject,
                                        String content) throws MessagingException {
         sendMessage(from, to, cc, bcc, subject, content, "text/html; charset=utf-8");
+    }
+
+    public void trySendUserActivationEmail(User user) {
+        try {
+            // send activation mail to the user
+            sendUserActivationEmail(user);
+        } catch (WebloggerException ex) {
+            log.error("Error sending activation email to - " + user.getEmailAddress(), ex);
+        }
     }
 
     /**
